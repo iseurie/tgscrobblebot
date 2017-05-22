@@ -1,0 +1,19 @@
+apply plugin: 'java'
+
+repositories {
+  mavenCentral()
+}
+
+model {
+  components {
+    main(JvmLibrarySpec) {
+      sources.java {
+        include "**/src/*.java"
+      }
+      dependencies {
+        compile group: 'commons-cli', name: 'commons-cli2', version: '2.0-CDH3'
+        compile group: 'com.github.pengrad', name: 'java-telegram-bot-api', version: '2.3.1.2'
+      }
+    }
+  }
+}
