@@ -20,22 +20,22 @@ public class UserEntry {
   public String getLfmKey() { return lfmKey; }
   public String getLfmUName() { return lfmUName; }
 
-  public UEntry(int uid, String uname, String key, int chids) {
+  public UserEntry(int uid, String uname, String key, int chids) {
     this.uid = uid;
     this.lfmKey = key;
     this.lfmUName = uname;
     chids = new ArrayList<Long>(chids);
   }
 
-  public UEntry(int uid, String uname, String key) {
-    return UEntry(uid, uname, key, 1);
+  public UserEntry(int uid, String uname, String key) {
+    return UserEntry(uid, uname, key, 1);
   }
 
-  public static UEntry decode(JsobObject obj, SecretKey secKey) {
+  public static UserEntry decode(JsobObject obj, SecretKey secKey) {
     Cipher c = Cipher.getInstance(Database.CIPHER);
     c.init(Cipher.DECRYPT_MODE, secKey);
     Base64.Decoder dec = Base64.getDecoder();
-    UEntry ret = new UEntry(
+    UserEntry ret = new UserEntry(
         obj.getInt(Database.JSON_KEY_UID),
         c.doFinal(dec.decode(obj.getString(Database.JSON_KEY_LFM_UNAME))),
         c.doFinal(dec.decode(obj.getString(Database.JSON_KEY_LFM_PASS))));
