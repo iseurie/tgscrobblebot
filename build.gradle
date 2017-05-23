@@ -1,4 +1,10 @@
-apply plugin: 'java'
+plugins {
+  id 'java'
+  id 'jvm-component'
+  id 'java-lang'
+}
+
+import org.gradle.jvm.JvmLibrarySpec;
 
 repositories {
   mavenCentral()
@@ -7,13 +13,29 @@ repositories {
 model {
   components {
     main(JvmLibrarySpec) {
-      sources.java {
-        include "**/src/*.java"
-      }
-      dependencies {
-        compile group: 'commons-cli', name: 'commons-cli2', version: '2.0-CDH3'
-        compile group: 'com.github.pengrad', name: 'java-telegram-bot-api', version: '2.3.1.2'
+      sources {
+        java {
+          source.srcDir "./src"
+        }
       }
     }
   }
+
+  tasks {
+    jar {
+      baseName "dev.eurie.scrobblebot"
+      manifest {
+        attributes(
+          "Main-Class" : "dev.eurie.tglfmbot.TglScrobbleBot",
+          "Implementation-Title" : "Telegram Scrobble Bot"
+        )
+      }
+    }
+  }
+}
+
+dependencies {
+  compile group: 'de.u-mass', name: 'lastfm-java', version: '0.1.2'
+  compile group: 'commons-cli', name: 'commons-cli2', version: '2.0-CDH3'
+  compile group: 'com.github.pengrad', name: 'java-telegram-bot-api', version: '2.3.1.2'
 }
