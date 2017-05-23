@@ -34,24 +34,24 @@ public class Database {
     }
   }
 
-  public void writeEntry(UserEntry newEnt) throws Exception {
+  public void writeEntry(UserEntry ent) throws Exception {
       // search current DOM for any entries matching this ID
-      JsonLocation loc = findEntById(newEnt.getUid());
+      JsonLocation loc = findEntById(ent.getUid());
       FileOutputStream ofstream = new FileOutputStream(this.file);
-      String nStr = newEnt.encode(secret).toString();
+      String nStr = ent.encode(this.secret).toString();
+      List<String> lines = Files.readAllLines(this.file.getAbsolutePath(),
+          Charset.defaultCharset());
       if(loc != null) {
-        List<String> lines = Files.readAllLines(this.file.getAbsolutePath(),
-            Charset.defaultCharset());
         lines.set(loc.getLineNumber(), nStr);
-        BufferedWriter w = new BufferedWriter(new FileOutputStream(this.file));
-        for(int i = 0; i < lines.length(); i++) {
-          w.write(lines.get(i));
-          w.newLine();
-        }
-        w.close();
       } else {
-
+        lines.add(nStr);
       }
+      BufferedWriter w = new BufferedWriter(new FileOutputStream(this.file));
+      for(int i = 0; i < lines.length(); i++) {
+        w.write(lines.get(i));
+        w.newLine();
+      }
+      w.close();
   }
 
   private JsonLocation findEntById(int uid) throws Exception {
