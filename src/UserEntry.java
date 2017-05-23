@@ -19,6 +19,10 @@ public class UserEntry {
   public int getUid() { return uid; }
   public String getLfmKey() { return lfmKey; }
   public String getLfmUName() { return lfmUName; }
+  public List<Long> getChids() { return this.chids; }
+
+  public void setLfmKey(String key) { this.lfmKey = key; }
+  public void setLfmUName(String uname) { this.lfmUName = uname; }
 
   public UserEntry(int uid, String uname, String key, int chids) {
     this.uid = uid;
