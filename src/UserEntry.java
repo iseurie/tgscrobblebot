@@ -11,10 +11,10 @@ import java.util.Base64;
 import java.io.FileOutputStream;
 
 public class UserEntry {
-  int uid;
-  String lfmKey;
-  String lfmUName;
-  public List<Long> chids;
+  private int uid;
+  private String lfmKey;
+  private String lfmUName;
+  private List<Long> chids;
 
   public int getUid() { return uid; }
   public String getLfmKey() { return lfmKey; }
@@ -24,11 +24,25 @@ public class UserEntry {
     this.uid = uid;
     this.lfmKey = key;
     this.lfmUName = uname;
-    chids = new ArrayList<Long>(chids);
+    this.chids = new ArrayList<Long>(chids);
   }
 
   public UserEntry(int uid, String uname, String key) {
     return UserEntry(uid, uname, key, 1);
+  }
+
+  public boolean rmChannel(long id) {
+    for(int i = 0; i < this.chids.length(); i++) {
+      if(this.chids.get(i).getLong() == id) {
+        this.chids.remove(i);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void addChannel(long id) {
+    this.chids.add(new Long(id));
   }
 
   public static UserEntry decode(JsobObject obj, SecretKey secKey) {
