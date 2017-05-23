@@ -4,14 +4,16 @@ import java.nio.file.Files;
 import java.nio.charset.Charset;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import javax.crypto.*;
 
 public class Database {
-  public final String JSON_KEY_LFM_UNAME = "lfm_uname";
-  public final String JSON_KEY_LFM_PASS = "lfm_key";
-  public final String JSON_KEY_CHIDS = "chats";
-  public final String JSON_KEY_UID = "uid";
-  public final String CIPHER = "AES";
+  public static final String JSON_KEY_LFM_UNAME = "lfm_uname";
+  public static final String JSON_KEY_LFM_PASS = "lfm_key";
+  public static final String JSON_KEY_CHIDS = "chats";
+  public static final String JSON_KEY_UID = "uid";
+  public static final String CIPHER = "AES";
   File file;
   SecretKey secret;
 
@@ -32,11 +34,11 @@ public class Database {
     }
   }
 
-  public void writeEntry(UEntry newEnt) throws Exception {
+  public void writeEntry(UserEntry newEnt) throws Exception {
       // search current DOM for any entries matching this ID
       JsonLocation loc = findEntById(newEnt.getUid());
       FileOutputStream ofstream = new FileOutputStream(this.file);
-      String nStr = newEnt.encode().toString();
+      String nStr = newEnt.encode(secret).toString();
       if(loc != null) {
         List<String> lines = Files.readAllLines(this.file.getAbsolutePath(),
             Charset.defaultCharset());
@@ -52,7 +54,7 @@ public class Database {
       }
   }
 
-  JsonLocation findEntById(int uid) throws Exception {
+  private JsonLocation findEntById(int uid) throws Exception {
     FileInputStream fstream = new FileInputStream(this.file);
     JsonParser p = Json.createParser(fstream);
     while(p.hasNext()) {

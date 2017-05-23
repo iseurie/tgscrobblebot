@@ -2,11 +2,15 @@ package dev.eurie.tglfmbot;
 import java.util.List;
 import java.util.ArrayList;
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
 import javax.json.JsonObject;
+import javax.json.JsonLocation;
+import javax.json.JsonParser.Event;
 import javax.json.Json;
 import java.util.Base64;
+import java.io.FileOutputStream;
 
-public class UEntry {
+public class UserEntry {
   int uid;
   String lfmKey;
   String lfmUName;
@@ -16,10 +20,6 @@ public class UEntry {
   public String getLfmKey() { return lfmKey; }
   public String getLfmUName() { return lfmUName; }
 
-  public UEntry(int uid, String uname, String key) {
-    return UEntry(uid, uname, key, 1);
-  }
-
   public UEntry(int uid, String uname, String key, int chids) {
     this.uid = uid;
     this.lfmKey = key;
@@ -27,8 +27,8 @@ public class UEntry {
     chids = new ArrayList<Long>(chids);
   }
 
-  public UEntry(JsonObject obj, byte[] secret) {
-    return decode(obj, secret);
+  public UEntry(int uid, String uname, String key) {
+    return UEntry(uid, uname, key, 1);
   }
 
   public static UEntry decode(JsobObject obj, SecretKey secKey) {
@@ -50,7 +50,7 @@ public class UEntry {
     c.init(Cipher.ENCRYPT_MODE, secKey);
     Base64.Encoder enc = Base64.getEncoder();
     JsonArray chidArr = Json.createArrayBuilder();
-    for(Long chid : this.chids) { chidArr.add(chid.getValue()); }
+    for(Long chid : this.chids) { chidArr.add(chid.longValue()); }
     JsonObject ret = Json.createObjectBuilder()
         .add(Database.JSON_KEY_UID, this.uid)
         .add(Database.JSON_KEY_LFM_UNAME, enc.encode(c.doFinal(lfmUName)))
