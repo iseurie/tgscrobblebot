@@ -13,12 +13,12 @@ public class Database {
   public static final String JSON_KEY_LFM_PASS = "lfm_key";
   public static final String JSON_KEY_CHIDS = "chats";
   public static final String JSON_KEY_UID = "uid";
-  public static final String CIPHER = "AES";
-  File file;
-  SecretKey secret;
+  private String cipher;
+  private File file;
+  private SecretKey secret;
 
-  public Database(byte[] secret, File file) {
-    this.secret = new SecretKeySpec(secret, CIPHER);
+  public Database(byte[] secret, File dbFile, String cipher) {
+    this.secret = new SecretKeySpec(secret, cipher);
     this.file = file;
   }
 
