@@ -10,6 +10,9 @@ repositories {
   mavenCentral()
 }
 
+sourceCompatibility = 1.8
+version = '0.1'
+
 model {
   components {
     main(JvmLibrarySpec) {
@@ -24,6 +27,7 @@ model {
   tasks {
     jar {
       baseName "dev.eurie.scrobblebot"
+      destinationDir "build/"
       manifest {
         attributes(
           "Main-Class" : "dev.eurie.tglfmbot.TglScrobbleBot",
@@ -35,7 +39,9 @@ model {
 }
 
 dependencies {
+  compile group: 'org.telegram', name: 'telegrambots', version: '3.0'
   compile group: 'de.u-mass', name: 'lastfm-java', version: '0.1.2'
   compile group: 'commons-cli', name: 'commons-cli2', version: '2.0-CDH3'
   compile group: 'com.github.pengrad', name: 'java-telegram-bot-api', version: '2.3.1.2'
+  compile group: 'javax.json', name: 'javax.json-api', version: '1.1'
 }

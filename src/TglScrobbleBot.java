@@ -1,51 +1,72 @@
 package dev.eurie.tglfmbot;
 
+import java.nio.charset.Charset;
 import org.apache.commons.cli2.*;
 import org.apache.commons.cli2.builder.*;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
-public class TglScrobbleBot {
-  FileValidator fv;
 
-  Argument finArg(ArgumentBuilder b, Validator v) {
-    b.withMaximum(1);
-    b.withMinimum(1);
-    if(v != null) b.withValidator(v);
-    return b.create();
+public class TglScrobbleBot extends TelegramLongPollingBot {
+  private String lfmApiKey;
+  private String tglApiKey;
+  private SecretKey dbSecret;
+
+  public TglScrobbleBot() {
+    this.lfmApiKey = null;
+    this.tglApiKey = null;
+    this.dbSecret = null;
   }
 
   Argument finArg(ArgumentBuilder b) {
-    confArg(b, null);
-  }
-
-  void parse(String[] args) {
-    FileValidator fv = FileValidator.getExistingFileInstance();
-    fv.setReadable(true);
-    fv.setWritable(false);
-    fv.setHidden(false);
-
-    Argument aesKeyStr = finArg(new ArgumentBuilder()
-            .withDescription("AES key to use"));
-    Argument lfmKeyStr = finArg(new ArgumentBuilder()
-            .withDescription("last.fm key to use"));
-    Argument tglKeyStr = finArg(new ArgumentBuilder()
-        .withDescription("Telegram key to use"));
-    Argument aesKeyPath = finArg(new ArgumentBuilder()
-        .withDescription("AES keyfile path"), fv);
-    Argument lfmKeyPath = finArg(new ArgumentBuilder()
-        .withDescription("last.fm API keyfile path"), fv);
-    Argument tglKeyPath = finArg(new ArgumentBuilder()
-        .withDescription("Telegram API keyfile path"), fv);
-
-    Parser p = new Parser();
-
-    // TODO: group arguments, add groups to parser
-    // use path and warn if both keystr and path are passed
-
+    b.withMaximum(1);
+    b.withMinimum(1);
+    b.required(true);
+    return b.create();
   }
 
   public void main(String[] args) {
-    // TODO: implement command-line options
-    // AES and last.fm and Telegram API key file paths (or values)
+    ArgumentBuilder abuilder = new ArgumentBuilder();
 
+    Argument cipher = abuilder.withName("cipher")
+        .withMaximum(1)
+        .withMinimum(1)
+        .withDescription("Cipher to use")
+        .withDefault("AES")
+        .required(false)
+        .create();
+
+    abuilder.withName("secret");
+    abuilder.withDescription("Cipher key file path");
+    Argument aesKeyStr = finArg(abuilder);
+
+    abuilder.withName("lfm-key");
+    abuilder.withDescription("last.fm API key");
+    Argument lfmKeyStr = finArg(abuilder);
+
+    abuilder.withName("tgl-key");
+    abuilder.withDescription("Telegram Bot API key");
+    Argument tglKeyStr = finArg(abuilder);
+
+    Parser p = new Parser();
+    Group opts = new GroupBuilder()
+        .withOption(aesKeyStr)
+        .withOption(lfmKeyStr)
+        .withOption(tglKeyStr)
+        .create();
+    p.setGroup(opts);
+    // CommandLine cl = p.parseAndHelp(args);
+    Option[] parsed = p.parseAndHelp(args).getOptions();
+    for(int i = 0; i < parsed.length; i++) {
+      switch(parsed[i]) {
+        case aesKeyStr:
+          RandomAccessFile raf = new RandomAccessFile(parsed[i].getValue(), "r");
+          byte[] buf = new byte[raf.length()];
+          raf.readFully(buf);
+          this.dbKey = new SecretKeySpec(buf, cipher.getValue());
+          break;
+        case lfmKeyStr: this.lfmApiKey = parsed[i].getValue(); break;
+        case tglKeyStr: this.tglApiKey = parsed[i].getValue(); break;
+      }
+    }
   }
 }
